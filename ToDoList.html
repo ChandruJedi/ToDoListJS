@@ -1,0 +1,281 @@
+<html lang="en" >
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.12/angular-material.min.css">
+  
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+</head>
+<style>
+.active-true{
+color: #ff1a1a;
+text-decoration: line-through;
+}
+.inputsize{
+	width:50px;
+}
+.marginTop{
+padding-top:60px;
+}
+.textArea{
+	width: 50px;
+}
+.high{
+	font-family: Verdana;
+    font-style:oblique;
+}
+</style>
+<body ng-app="demo" ng-controller="ctrl" ng-cloak>
+<md-content  layout="column" class="marginTop" layout-align="center center">
+	<h2 class="high">Chandru's ToDoList</h2>
+    <h3 class="high">Enter the data...</h3>
+	<md-input-container >
+    <form ng-submit="add()" name="toDoForm">
+      <input ng-model="name" type="text" placeholder="Enter the text..." required>
+  	  <md-button type="submit" class="md-raised md-primary" ng-disabled="toDoForm.$invalid" >Add</md-button>
+      <b>Items Left: {{count}}</b>
+      </form>
+    </md-input-container>
+ </md-content>
+ <div ng-style="textArea" >
+    <div  layout="row"  ng-if="isAll || start" layout-align="space-around center"  ng-repeat="x in names">
+        
+          <md-input-container >
+            <h4 class="active-{{x.completed}}">{{x.name}}</h4>
+           </md-input-container >
+       
+    	<md-input-container ><md-checkbox type="checkbox" ng-click="activateName()" ng-model="x.completed" ></md-checkbox></md-input-container >
+   	
+ 		
+                    <md-input-container >
+    		<md-button class="md-raised" ng-click="enableEdit();" data-toggle="modal" data-target="#example{{$index}}">Edit</md-button>
+            </md-input-container >
+            <md-input-container >
+    		<md-button class="md-fab md-hue-3 md-danger ml-auto" ng-click="delete($index);"><i class="material-icons">
+				delete_outline
+			</i></md-button></md-input-container >
+            <div class="modal fade" id="example{{$index}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Change the text here...</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form ng-submit="onSubmit(x)" ng-show="editClicked">
+                    <md-input-container >
+                    <input ng-model="x.name" class="inputsize">
+                    <md-button class="md-raised" type="submit" data-dismiss="modal" ng-click="submitted()">Save Changes</md-button>
+                    </md-input-container >
+                    </form>
+      </div>
+    </div>
+  </div>
+</div>
+		
+ </div>
+ </div>
+  
+  
+ <div ng-style="textArea" id="demo" ng-if="done">
+    	<div  layout="row" layout-align="space-around center"  ng-repeat="x in names " ng-show="x.completed==true">
+              <md-input-container >
+                  <h4 class="active-{{x.completed}}">{{x.name}}</h4>
+              </md-input-container >
+              <md-input-container >
+    	<md-checkbox type="checkbox" ng-click="activateName()" ng-model="x.completed" ></md-checkbox>
+        </md-input-container >
+        <md-input-container >
+    
+ 	
+
+     <md-button class="md-raised" ng-click="enableEdit();" data-toggle="modal" data-target="#example{{$index}}">Edit</md-button>
+    </md-input-container >
+    <md-input-container >
+    <md-button class="md-fab md-hue-3 md-danger ml-auto" ng-click="delete($index);"><i class="material-icons">
+delete_outline
+</i></md-button>
+</md-input-container >
+<div class="modal fade" id="example{{$index}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Change the text here...</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form ng-submit="onSubmit(x)" ng-show="editClicked">
+                    <md-input-container >
+                    <input ng-model="x.name" class="inputsize">
+                    <md-button class="md-raised" type="submit" data-dismiss="modal" ng-click="submitted()">Save Changes</md-button>
+                    </md-input-container >
+                    </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+   <div ng-style="textArea" id="demo" ng-if="isActive">
+    	<div  layout="row" layout-align="space-around center"  ng-repeat="x in names " ng-show="x.completed==false">
+              <md-input-container >
+                  <h4 class="active-{{x.completed}}">{{x.name}}</h4>
+              </md-input-container >
+              <md-input-container >
+    	<md-checkbox type="checkbox" ng-click="activateName()" ng-model="x.completed" ></md-checkbox>
+        </md-input-container >
+
+  <md-input-container >
+     <md-button class="md-raised" ng-click="enableEdit();" data-toggle="modal" data-target="#example{{$index}}">Edit</md-button>
+  </md-input-container >  
+  <md-input-container >
+    <md-button class="md-fab md-hue-3 md-danger ml-auto" ng-click="delete($index);"><i class="material-icons">
+    delete_outline
+</i></md-button></md-input-container >
+
+<div class="modal fade" id="example{{$index}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Change the text here...</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form ng-submit="onSubmit(x)" ng-show="editClicked">
+                    <md-input-container >
+                    <input ng-model="x.name" class="inputsize">
+                    <md-button class="md-raised" type="submit" data-dismiss="modal" ng-click="submitted()">Save Changes</md-button>
+                    </md-input-container >
+                    </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+ </div>
+ <md-content  layout="row" layout-align="center center">
+	<md-input-container >
+      <md-button class="md-raised md-hue-3" ng-click="all()">Show All</md-button>
+      <md-button class="md-raised md-hue-3" ng-click="showDone()">Show Done</md-button>
+       <md-button class="md-raised md-hue-3" ng-click="showActive()">Show Active</md-button>
+       <md-button class="md-raised md-hue-3" ng-click="clearDone()">Clear Done</md-button>
+       <md-button class="md-raised md-hue-3" ng-click="clearAll()">Clear All</md-button>
+       <md-button class="md-raised md-hue-3" ng-click="showSession()">Session Storage</md-button>
+    </md-input-container>
+ </md-content>
+ <p class="high"> Note: Before refreshing the page, make sure you click on the Session Storage to save the last entered data. Otherwise, the latest data will not be saved. This is to show how the Session Storage actually works.</p>
+ 
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-animate.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-aria.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-messages.min.js"></script>
+<script src='checklist-model.js'></script>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.12/angular-material.min.js"></script>
+  
+   <script type="text/javascript">    
+    angular.module('demo', ['ngMaterial', 'ngMessages']).controller("ctrl", function($scope) {
+   $scope.names=JSON.parse(localStorage.getItem("savedNames") || '[]');
+   $scope.count=JSON.parse(localStorage.getItem("counted"));
+   console.log(JSON.parse(localStorage.getItem("savedNames") || '[]'));
+   console.log($scope.names);
+    $scope.editClicked=false;
+    $scope.tempNames=$scope.names;
+    $scope.cleared=false;
+    $scope.done=false;
+    $scope.isActive=false;
+    $scope.isAll=false;
+    $scope.start=true;
+    
+	$scope.textArea={
+    }
+    $scope.add=function(){
+    	$scope.count++;
+    	$scope.names.push(new entry($scope.name));
+        
+        $scope.new="";
+    }
+    $scope.delete=function(y){
+    $scope.count--;
+    	$scope.names.splice(y,1);
+        }
+     $scope.activateName=function(){
+     	$scope.names.completed=true;
+        $scope.count--;
+     }
+     $scope.submitted=function(){
+     	$scope.editClicked=false;
+     }
+    $scope.enableEdit=function(){
+    	$scope.editClicked=true;
+    }
+     $scope.showDone=function(x){
+     $scope.isActive=false;
+    $scope.done=true;
+    $scope.isAll=false;
+    $scope.start=false;
+     	
+     }
+     $scope.clearAll=function(){
+     $scope.count=0;
+     	$scope.names=[];
+     }
+     $scope.edit=function(x){
+     	$scope.x=$scope.names.name;
+     }
+     $scope.clearDone=function(){
+     var activeItem=$scope.names;
+     	angular.forEach(activeItem, function(x) {
+     if(x.completed){
+     $scope.count--;
+        	$scope.names.splice(x,1);
+        }
+  		
+		});
+        $scope.cleared=true;
+        $scope.all();
+     }
+     $scope.all=function(){
+     $scope.isAll=true;
+     $scope.start=false;
+     $scope.isActive=false;
+     $scope.done=false;
+      $scope.names = angular.copy(x);
+    
+     }
+     $scope.showActive=function(){
+     $scope.done=false;
+     $scope.isAll=false;
+     $scope.isActive=true;
+     $scope.start=false;
+     }
+     $scope.showSession=function(){
+     localStorage.setItem("savedNames", JSON.stringify($scope.names));
+	localStorage.setItem("counted", JSON.stringify($scope.count));
+    }
+});
+;
+function entry(myentry){
+this.name=myentry;
+this.completed=false;
+}
+
+
+  </script>
+  
+</body>
+
+</html>

@@ -26,16 +26,22 @@ padding-top:60px;
 	font-family: Verdana;
     font-style:oblique;
 }
+.warn-text{
+	color: #ff1a1a;
+	font-size: 13px;
+	bg-color:black;
+}
 </style>
-<body ng-app="demo" ng-controller="ctrl" ng-cloak>
+<body ng-app="demo" ng-controller="ctrl" ng-cloak >
 <md-content  layout="column" class="marginTop" layout-align="center center">
 	<h2 class="high">Chandru's ToDoList</h2>
     <h3 class="high">Enter the data...</h3>
 	<md-input-container >
     <form ng-submit="add()" name="toDoForm">
-      <input ng-model="name" type="text" placeholder="Enter the text..." required>
-  	  <md-button type="submit" class="md-raised md-primary" ng-disabled="toDoForm.$invalid" >Add</md-button>
+      <input ng-model="name" type="text"  placeholder="Enter the text..." pattern="[A-Za-z0-9]{5,10}" required>
+  	  <md-button type="submit" class="md-raised md-primary" ng-disabled="toDoForm.$invalid" >Add</md-button> 
       <b>Items Left: {{count}}</b>
+	<p class="warn-text" ng-if="toDoForm.$invalid">Make your ToDo look short and beautiful..:)<br> It will accept only the text and numbers. [Character Limit: 5 to 10]</p>
       </form>
     </md-input-container>
  </md-content>
@@ -46,14 +52,14 @@ padding-top:60px;
             <h4 class="active-{{x.completed}}">{{x.name}}</h4>
            </md-input-container >
        
-    	<md-input-container ><md-checkbox type="checkbox" ng-click="activateName()" ng-model="x.completed" ></md-checkbox></md-input-container >
+    	<md-input-container ><md-checkbox type="checkbox" ng-click="activateName(x.completed)" ng-model="x.completed"></md-checkbox></md-input-container >
    	
  		
                     <md-input-container >
     		<md-button class="md-raised" ng-click="enableEdit();" data-toggle="modal" data-target="#example{{$index}}">Edit</md-button>
             </md-input-container >
             <md-input-container >
-    		<md-button class="md-fab md-hue-3 md-danger ml-auto" ng-click="delete($index);"><i class="material-icons">
+    		<md-button class="md-fab md-hue-3 md-danger ml-auto" ng-click="delete($index,x);"><i class="material-icons">
 				delete_outline
 			</i></md-button></md-input-container >
             <div class="modal fade" id="example{{$index}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -166,15 +172,15 @@ delete_outline
  </div>
  <md-content  layout="row" layout-align="center center">
 	<md-input-container >
-      <md-button class="md-raised md-hue-3" ng-click="all()">Show All</md-button>
+      <md-button class="md-raised md-hue-3" ng-click="all(x)">Show All</md-button>
       <md-button class="md-raised md-hue-3" ng-click="showDone()">Show Done</md-button>
        <md-button class="md-raised md-hue-3" ng-click="showActive()">Show Active</md-button>
-       <md-button class="md-raised md-hue-3" ng-click="clearDone()">Clear Done</md-button>
+       <md-button class="md-raised md-hue-3" ng-click="clearDone(x)">Clear Done</md-button>
        <md-button class="md-raised md-hue-3" ng-click="clearAll()">Clear All</md-button>
-       <md-button class="md-raised md-hue-3" ng-click="showSession()">Session Storage</md-button>
+       
     </md-input-container>
  </md-content>
- <p class="high"> Note: Before refreshing the page, make sure you click on the Session Storage to save the last entered data. Otherwise, the latest data will not be saved. This is to show how the Session Storage actually works.</p>
+ <p class="high"> Note: Session storage enabled!</p>
  
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-animate.min.js"></script>
@@ -188,7 +194,8 @@ delete_outline
   
    <script type="text/javascript">    
     angular.module('demo', ['ngMaterial', 'ngMessages']).controller("ctrl", function($scope) {
-   $scope.names=JSON.parse(localStorage.getItem("savedNames") || '[]');
+   
+ $scope.names=JSON.parse(localStorage.getItem("savedNames") || '[]');
    $scope.count=JSON.parse(localStorage.getItem("counted"));
    console.log(JSON.parse(localStorage.getItem("savedNames") || '[]'));
    console.log($scope.names);
@@ -199,52 +206,72 @@ delete_outline
     $scope.isActive=false;
     $scope.isAll=false;
     $scope.start=true;
+     function entry(myentry){
+	this.name=myentry;
+	this.completed=false;
+
+     }
+
     
-	$scope.textArea={
-    }
     $scope.add=function(){
     	$scope.count++;
     	$scope.names.push(new entry($scope.name));
-        
-        $scope.new="";
+        $scope.name="";
+
+
     }
-    $scope.delete=function(y){
-    $scope.count--;
-    	$scope.names.splice(y,1);
-        }
-     $scope.activateName=function(){
-     	$scope.names.completed=true;
-        $scope.count--;
+    $scope.delete=function(y,x){
+    if(!$scope.count==0 && x.completed || x.completed){
+	 $scope.names.splice(y,1);
+	} else {
+ 	$scope.names.splice(y,1);
+	$scope.count--;
+	
+	}
+	console.log(x.completed);
+   
+      }
+     $scope.activateName=function(y){
+     	if(y){
+		$scope.names.completed=!$scope.names.completed;
+		$scope.count++;
+	
+        } else {
+		$scope.names.completed=!$scope.names.completed;
+		$scope.count--;
+		
+	} 
+
      }
      $scope.submitted=function(){
      	$scope.editClicked=false;
+
      }
     $scope.enableEdit=function(){
     	$scope.editClicked=true;
+
     }
      $scope.showDone=function(x){
      $scope.isActive=false;
     $scope.done=true;
     $scope.isAll=false;
     $scope.start=false;
-     	
+
      }
      $scope.clearAll=function(){
      $scope.count=0;
      	$scope.names=[];
+
      }
      $scope.edit=function(x){
      	$scope.x=$scope.names.name;
+
      }
-     $scope.clearDone=function(){
+     $scope.clearDone=function(x){
      var activeItem=$scope.names;
-     	angular.forEach(activeItem, function(x) {
-     if(x.completed){
-     $scope.count--;
-        	$scope.names.splice(x,1);
-        }
-  		
-		});
+        $scope.names = activeItem = activeItem.filter(function (x) {
+					return !x.completed;
+				});
         $scope.cleared=true;
         $scope.all();
      }
@@ -253,25 +280,23 @@ delete_outline
      $scope.start=false;
      $scope.isActive=false;
      $scope.done=false;
-      $scope.names = angular.copy(x);
-    
+     // $scope.names = angular.copy(x);
      }
      $scope.showActive=function(){
      $scope.done=false;
      $scope.isAll=false;
      $scope.isActive=true;
      $scope.start=false;
+	
      }
      $scope.showSession=function(){
      localStorage.setItem("savedNames", JSON.stringify($scope.names));
 	localStorage.setItem("counted", JSON.stringify($scope.count));
     }
+	setInterval($scope.showSession, 50);
+	
 });
 ;
-function entry(myentry){
-this.name=myentry;
-this.completed=false;
-}
 
 
   </script>
